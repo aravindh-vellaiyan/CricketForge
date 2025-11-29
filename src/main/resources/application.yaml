@@ -1,3 +1,27 @@
+server:
+  port: 8080
+
 spring:
   application:
     name: Cricket Team Manager API
+  datasource:
+    url: jdbc:postgresql://localhost:5432/cricketdb
+    username: postgres
+    #password:
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update   # Change to validate in prod
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  jackson:
+    serialization:
+      INDENT_OUTPUT: true
+logging:
+  level:
+    root: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE

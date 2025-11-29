@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<h2>Login</h2>
+
+<input id="email" placeholder="Email">
+<input id="password" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+
+<p class="error" id="error"></p>
+
+<script src="app.js"></script>
+<script>
+    async function login() {
+        try {
+            await api("http://localhost:8080/auth/login", "POST", {
+                email: email.value,
+                password: password.value
+            });
+            redirect("teams.html");
+        } catch (err) {
+            showError("error", "Invalid credentials");
+        }
+    }
+</script>
+</body>
+</html>

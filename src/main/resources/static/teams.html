@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teams</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<h2>All Teams</h2>
+
+<div id="teams"></div>
+
+<p id="error" class="error"></p>
+
+<script src="app.js"></script>
+<script>
+    async function loadTeams() {
+        try {
+            const data = await api("http://localhost:8080/teams");
+
+            teams.innerHTML = data.map(t => `
+                <div class="card">
+                    <h3>${t.name}</h3>
+                    <b>Players:</b>
+                    <ul>
+                        ${t.players.map(p =>
+                            `<li>${p.firstName} ${p.lastName || ''} - ${p.role || 'N/A'} (${p.type})</li>`
+                        ).join("")}
+                    </ul>
+                </div>
+            `).join("");
+
+        } catch (err) {
+            showError("error", "Unauthorized or session expired");
+        }
+    }
+
+    loadTeams();
+</script>
+</body>
+</html>

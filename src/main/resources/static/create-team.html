@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Team</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<h2>Create Team</h2>
+
+<input id="teamName" placeholder="Team Name">
+
+<textarea id="playersJson" rows="8" placeholder='[
+  {"firstName":"Rohit","lastName":"Sharma","role":"Batsman","type":"CAPTAIN"},
+  {"firstName":"Bumrah","role":"Bowler","type":"NORMAL"}
+]'></textarea>
+
+<button onclick="createTeam()">Create Team</button>
+
+<p id="error" class="error"></p>
+
+<script src="app.js"></script>
+<script>
+    async function createTeam() {
+        try {
+            const body = {
+                name: teamName.value,
+                players: JSON.parse(playersJson.value)
+            };
+
+            await api("http://localhost:8080/teams", "POST", body);
+
+            redirect("teams.html");
+
+        } catch (err) {
+            showError("error", err.message);
+        }
+    }
+</script>
+
+</body>
+</html>

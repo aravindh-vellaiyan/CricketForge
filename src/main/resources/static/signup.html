@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Signup</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<h2>Signup</h2>
+
+<input id="name" placeholder="Name">
+<input id="email" placeholder="Email">
+<input id="password" type="password" placeholder="Password">
+
+<button onclick="signup()">Signup</button>
+
+<p class="error" id="error"></p>
+
+<script src="app.js"></script>
+<script>
+    async function signup() {
+        try {
+            const nameValue = document.getElementById("name").value;
+            const emailValue = document.getElementById("email").value;
+            const passwordValue = document.getElementById("password").value;
+
+            await api("http://localhost:8080/auth/signup", "POST", {
+                name: nameValue,
+                email: emailValue,
+                password: passwordValue
+            });
+
+            redirect("login.html");
+
+        } catch (err) {
+            showError("error", err.message);
+        }
+    }
+</script>
+</body>
+</html>
