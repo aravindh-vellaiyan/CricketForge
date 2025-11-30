@@ -2,30 +2,47 @@ package com.cricforge.team_management.mapper;
 
 import com.cricforge.team_management.domain.Player;
 import com.cricforge.team_management.domain.Team;
+import com.cricforge.team_management.domain.TeamRole;
 import com.cricforge.team_management.dto.PlayerResponse;
 import com.cricforge.team_management.dto.TeamResponse;
+import com.cricforge.team_management.dto.UserSummaryResponse;
 
-import java.util.stream.Collectors;
+import java.util.List;
 
 public class TeamMapper {
 
     public static TeamResponse toResponse(Team team) {
+
+        List<UserSummaryResponse> admins =
+                team.getUserRoles().stream()
+                        .filter(role -> role.getRole() == TeamRole.TEAM_ADMIN)
+                        .map(role -> new UserSummaryResponse(
+                                role.getUser().getId(),
+                                role.getUser().getName(),
+                                role.getUser().getEmail()
+                        ))
+                        .toList();
+
+        List<PlayerResponse> players =
+                team.getPlayers().stream()
+                        .map(TeamMapper::toPlayerResponse)
+                        .toList();
+
         return new TeamResponse(
                 team.getId(),
                 team.getName(),
-                team.getPlayers().stream()
-                        .map(TeamMapper::toPlayerResponse)
-                        .collect(Collectors.toList())
+                admins,
+                players
         );
     }
 
-    private static PlayerResponse toPlayerResponse(Player p) {
+    private static PlayerResponse toPlayerResponse(Player player) {
         return new PlayerResponse(
-                p.getId(),
-                p.getFirstName(),
-                p.getLastName(),
-                p.getRole(),
-                p.getType().name()
+                player.getId(),
+                player.getFirstName(),
+                player.getLastName(),
+                player.getRole(),
+                player.getType().name()
         );
     }
 }

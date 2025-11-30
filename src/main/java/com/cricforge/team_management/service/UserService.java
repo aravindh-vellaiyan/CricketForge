@@ -1,11 +1,11 @@
 package com.cricforge.team_management.service;
 
+import com.cricforge.team_management.domain.Role;
 import com.cricforge.team_management.domain.UserAccount;
 import com.cricforge.team_management.domain.UserSession;
 import com.cricforge.team_management.dto.LoginRequest;
 import com.cricforge.team_management.dto.SignupRequest;
 import com.cricforge.team_management.dto.UserResponse;
-import com.cricforge.team_management.exception.InvalidSessionException;
 import com.cricforge.team_management.repository.UserAccountRepository;
 import com.cricforge.team_management.repository.UserSessionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,7 @@ public class UserService {
 
         userRepo.save(user);
 
-        return new UserResponse(user.getId(), user.getName(), user.getEmail());
+        return new UserResponse(user.getId(), user.getName(), user.getEmail(), Role.getRole(user.getRole()));
     }
 
     public UserSession login(LoginRequest req) {
@@ -78,5 +78,12 @@ public class UserService {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void updateUserRole(Long userId, Role role) {
+        UserAccount user = userRepo.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        user.setRole(role);
+        userRepo.save(user);
     }
 }

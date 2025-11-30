@@ -1,16 +1,16 @@
 package com.cricforge.team_management.service;
 
-import com.cricforge.team_management.domain.Player;
-import com.cricforge.team_management.domain.PlayerType;
-import com.cricforge.team_management.domain.Team;
+import com.cricforge.team_management.domain.*;
 import com.cricforge.team_management.dto.TeamRegistrationRequest;
-import com.cricforge.team_management.dto.TeamResponse;
-import com.cricforge.team_management.mapper.TeamMapper;
 import com.cricforge.team_management.repository.TeamRepository;
+import com.cricforge.team_management.repository.UserAccountRepository;
+import com.cricforge.team_management.repository.UserTeamRoleRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TeamService {
@@ -18,7 +18,14 @@ public class TeamService {
     @Autowired
     private TeamRepository teamRepo;
 
-    public Team registerTeam(TeamRegistrationRequest req) {
+    @Autowired
+    private UserAccountRepository userRepo;
+
+    @Autowired
+    private UserTeamRoleRepository userTeamRoleRepo;
+
+    @Transactional
+    public Team registerTeam(TeamRegistrationRequest req, UserAccount creator) {
 
         if (req.players().size() > 15) {
             throw new IllegalArgumentException("Max 15 players allowed");
@@ -51,15 +58,39 @@ public class TeamService {
 
             return player;
         }).toList();
-
         team.setPlayers(players);
-        return teamRepo.save(team);
+
+        Team registeredTeam = teamRepo.save(team);
+
+        // Assign creator as TEAM_ADMIN
+        UserTeamRole utr = new UserTeamRole();
+        utr.setTeam(registeredTeam);
+        utr.setUser(creator);
+        utr.setRole(TeamRole.TEAM_ADMIN);
+
+        userTeamRoleRepo.save(utr);
+
+        return registeredTeam;
     }
 
-    public List<TeamResponse> getAllTeams() {
-        return teamRepo.findAll()
-                .stream()
-                .map(TeamMapper::toResponse)
-                .toList();
+    public List<Team> getAllTeams() {
+        return teamRepo.findAll();
+    }
+
+    public Optional<Team> getTeam(Long teamId) {
+        return teamRepo.findById(teamId);
+    }
+
+    public void updateUserTeamRole(UserAccount user, Team team, TeamRole teamRole) {
+        UserTeamRole utr = new UserTeamRole();
+        utr.setTeam(team);
+        utr.setUser(user);
+
+        if(teamRole == null || teamRole == TeamRole.TEAM_MEMBER) {
+            userTeamRoleRepo.delete(utr);
+            return;
+        }
+        utr.setRole(teamRole);
+        userTeamRoleRepo.save(utr);
     }
 }

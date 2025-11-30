@@ -1,5 +1,6 @@
 package com.cricforge.team_management.controller;
 
+import com.cricforge.team_management.domain.Role;
 import com.cricforge.team_management.domain.UserAccount;
 import com.cricforge.team_management.domain.UserSession;
 import com.cricforge.team_management.dto.LoginRequest;
@@ -34,10 +35,12 @@ public class AuthController {
         cookie.setPath("/");
         cookie.setMaxAge(12 * 60 * 60); // 12 hours
         response.addCookie(cookie);
+        UserAccount user = session.getUser();
         return new UserResponse(
-                session.getUser().getId(),
-                session.getUser().getName(),
-                session.getUser().getEmail()
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                Role.getRole(user.getRole())
         );
     }
 
@@ -50,7 +53,8 @@ public class AuthController {
         return new UserResponse(
                 user.getId(),
                 user.getName(),
-                user.getEmail()
+                user.getEmail(),
+                Role.getRole(user.getRole())
         );
     }
 }

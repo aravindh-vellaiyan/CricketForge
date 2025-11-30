@@ -20,4 +20,7 @@ public class Team {
 
     @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Player> players = new ArrayList<>();
+
+    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL)
+    private List<UserTeamRole> userRoles = new ArrayList<>();
 }

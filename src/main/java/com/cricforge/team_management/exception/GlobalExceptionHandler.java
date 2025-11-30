@@ -44,4 +44,15 @@ public class GlobalExceptionHandler {
                         "message", "Something went wrong"
                 ));
     }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> handleUnauthorizedAccess(AccessDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of(
+                        "timestamp", Instant.now().toString(),
+                        "status", HttpStatus.UNAUTHORIZED.value(),
+                        "error", "Unauthorized",
+                        "message", ex.getMessage()
+                ));
+    }
 }

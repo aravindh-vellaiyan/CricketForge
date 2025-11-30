@@ -1,8 +1,7 @@
 package com.cricforge.team_management.dto;
 
-public record UserResponse(
+public record UserSummaryResponse(
         Long id,
         String name,
-        String email,
-        String role
+        String email
 ) {}
