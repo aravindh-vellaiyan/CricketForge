@@ -5,6 +5,7 @@ import com.cricforge.team_management.dto.TeamRegistrationRequest;
 import com.cricforge.team_management.dto.TeamResponse;
 import com.cricforge.team_management.service.TeamService;
 import com.cricforge.team_management.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,9 +27,9 @@ public class TeamController {
         return ResponseEntity.ok(teamService.registerTeam(req));
     }
 
-    @GetMapping
-    public List<TeamResponse> getAllTeams(@CookieValue("SESSION_ID") String sessionId) {
-        userService.validateSession(sessionId); // throws InvalidSessionException if bad
+    @GetMapping("/teams")
+    public List<TeamResponse> getTeams(HttpServletRequest req) {
+        UserAccount user = (UserAccount) req.getAttribute("authenticatedUser");
         return teamService.getAllTeams();
     }
 }

@@ -8,12 +8,40 @@
 
 <h1>Cricket Management App</h1>
 
-<button onclick="redirect('signup.html')">Signup</button>
-<button onclick="redirect('login.html')">Login</button>
-<button onclick="redirect('teams.html')">View Teams</button>
-<button onclick="redirect('create-team.html')">Create Team</button>
-<button onclick="redirect('create-match.html')">Create Match</button>
+<div id="loggedOut">
+    <button onclick="redirect('signup.html')">Signup</button>
+    <button onclick="redirect('login.html')">Login</button>
+</div>
+
+<div id="loggedIn" style="display:none;">
+    <h3>Welcome! Choose an Action:</h3>
+    <button onclick="redirect('teams.html')">View Teams</button>
+    <button onclick="redirect('create-team.html')">Create Team</button>
+    <button onclick="redirect('create-match.html')">Create Match</button>
+    <button onclick="logout()">Logout</button>
+</div>
 
 <script src="app.js"></script>
+<script>
+    async function checkLogin() {
+        try {
+            const user = await api("http://localhost:8080/auth/me");
+            document.getElementById("loggedOut").style.display = "none";
+            document.getElementById("loggedIn").style.display = "block";
+        } catch (err) {
+            document.getElementById("loggedOut").style.display = "block";
+            document.getElementById("loggedIn").style.display = "none";
+        }
+    }
+
+    async function logout() {
+        document.cookie = "SESSION_ID=; Max-Age=0; path=/";
+        redirect("index.html");
+    }
+
+    checkLogin();
+
+</script>
+
 </body>
 </html>

@@ -15,6 +15,7 @@ import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.HexFormat;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -58,11 +59,10 @@ public class UserService {
         return sessionRepo.save(session);
     }
 
-    public UserAccount validateSession(String sessionId) {
+    public Optional<UserAccount> validateSession(String sessionId) {
         return sessionRepo.findBySessionId(sessionId)
                 .filter(s -> s.getExpiresAt().isAfter(LocalDateTime.now()))
-                .map(UserSession::getUser)
-                .orElseThrow(() -> new InvalidSessionException("Invalid or expired session"));
+                .map(UserSession::getUser);
     }
 
     private String generateSessionId() {
