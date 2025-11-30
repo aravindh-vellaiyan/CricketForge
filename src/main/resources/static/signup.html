@@ -8,9 +8,9 @@
 
 <h2>Signup</h2>
 
-<input id="name" placeholder="Name">
-<input id="email" placeholder="Email">
-<input id="password" type="password" placeholder="Password">
+<label for="name"></label><input id="name" placeholder="Name">
+<label for="email"></label><input id="email" placeholder="Email">
+<label for="password"></label><input id="password" type="password" placeholder="Password">
 
 <button onclick="signup()">Signup</button>
 
@@ -36,6 +36,17 @@
             showError("error", err.message);
         }
     }
+    document.addEventListener("keydown", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            const btn = document.querySelector("button");
+            if (btn) btn.click();
+        }
+    });
+    document.addEventListener("", function() {
+
+    });
+    clearErrorOnInput("error");
 </script>
 </body>
 </html>

@@ -2,7 +2,7 @@ async function api(url, method = "GET", body = null) {
     const options = {
         method,
         headers: { "Content-Type": "application/json" },
-        credentials: "include" // IMPORTANT: send cookies
+        credentials: "include"
     };
 
     if (body) options.body = JSON.stringify(body);
@@ -10,11 +10,27 @@ async function api(url, method = "GET", body = null) {
     const res = await fetch(url, options);
 
     if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text);
+        let errorBody = await res.text();
+        let parsed;
+
+        try {
+            parsed = JSON.parse(errorBody); // backend error JSON
+        } catch (e) {
+            throw new Error(errorBody); // plain text fallback
+        }
+
+        throw parsed;  // <<=== THROW THE OBJECT, not Error()
     }
 
     return res.json();
+}
+function clearErrorOnInput(errorId) {
+    const errorEl = document.getElementById(errorId);
+    document.querySelectorAll("input, textarea, select").forEach(el => {
+        el.addEventListener("input", () => {
+            if (errorEl) errorEl.innerText = "";
+        });
+    });
 }
 
 function showError(id, msg) {

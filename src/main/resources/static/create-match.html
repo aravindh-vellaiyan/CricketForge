@@ -1,34 +1,30 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Create Team</title>
+    <title>Create Match</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<h2>Create Team</h2>
+<h2>Create Match</h2>
 
-<input id="teamName" placeholder="Team Name">
+<input id="teamA" placeholder="Team A ID">
+<input id="teamB" placeholder="Team B ID">
+<input id="date" type="datetime-local">
 
-<textarea id="playersJson" rows="8" placeholder='[
-  {"firstName":"Rohit","lastName":"Sharma","role":"Batsman","type":"CAPTAIN"},
-  {"firstName":"Bumrah","role":"Bowler","type":"NORMAL"}
-]'></textarea>
-
-<button onclick="createTeam()">Create Team</button>
+<button onclick="createMatch()">Create Match</button>
 
 <p id="error" class="error"></p>
 
 <script src="app.js"></script>
 <script>
-    async function createTeam() {
+    async function createMatch() {
         try {
-            const body = {
-                name: teamName.value,
-                players: JSON.parse(playersJson.value)
-            };
-
-            await api("http://localhost:8080/teams", "POST", body);
+            await api("http://localhost:8080/matches", "POST", {
+                teamAId: Number(teamA.value),
+                teamBId: Number(teamB.value),
+                scheduledAt: date.value
+            });
 
             redirect("teams.html");
 
@@ -36,6 +32,14 @@
             showError("error", err.message);
         }
     }
+    document.addEventListener("keydown", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            const btn = document.querySelector("button");
+            if (btn) btn.click();
+        }
+    });
+    clearErrorOnInput("error");
 </script>
 
 </body>
