@@ -58,7 +58,7 @@ Implements real cricket rules:
 
 ---
 ## 📄 License
-MIT License — open for public use, modification, and distribution.
+MIT License — open for public use, modification and distribution.
 
 ---
 ## 🗺 Roadmap
@@ -73,8 +73,8 @@ MIT License — open for public use, modification, and distribution.
 ---
 ## 🏅 Author
 
-Aravindh Vellaiyan
-Senior Backend Engineer
-Maintainer of CricForge
+Aravindh Vellaiyan  
+Senior Backend Engineer  
+Maintainer of CricForge  
 
 ---
