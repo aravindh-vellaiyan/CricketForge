@@ -1,9 +1,6 @@
 package com.cricforge.team_management.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,15 +10,24 @@ import java.time.LocalDateTime;
 @Entity
 public class Match {
 
-    @Id
-    @GeneratedValue
+    @Id @GeneratedValue
     private Long id;
 
-    @ManyToOne(optional = false)
-    private Team teamA;
+    @ManyToOne private Team teamA;
+    @ManyToOne private Team teamB;
 
-    @ManyToOne(optional = false)
-    private Team teamB;
+    private int innings = 1;
 
-    private LocalDateTime scheduledAt;
+    private int totalRuns = 0;
+    private int wickets = 0;
+
+    private int balls = 0; // balls in current over (0–5)
+    private int overs = 0;
+
+    @Enumerated(EnumType.STRING)
+    private MatchStatus status = MatchStatus.IN_PROGRESS;
+
+    @ManyToOne private Player striker;
+    @ManyToOne private Player nonStriker;
+    @ManyToOne private Player bowler;
 }

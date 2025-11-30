@@ -1,9 +1,6 @@
 package com.cricforge.team_management.service;
 
-import com.cricforge.team_management.domain.Role;
-import com.cricforge.team_management.domain.Team;
-import com.cricforge.team_management.domain.TeamRole;
-import com.cricforge.team_management.domain.UserAccount;
+import com.cricforge.team_management.domain.*;
 import com.cricforge.team_management.exception.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -25,5 +22,14 @@ public class AuthorizationService {
         return user.getTeamRoles().stream()
                 .anyMatch(r -> r.getTeam().getId().equals(team.getId())
                         && r.getRole() == TeamRole.TEAM_ADMIN);
+    }
+
+    public boolean canScoreMatch(UserAccount user, Match match) {
+        if (user.getRole() == Role.APP_ADMIN) return true;
+
+        boolean teamAAdmin = isTeamAdmin(user, match.getTeamA());
+        boolean teamBAdmin = isTeamAdmin(user, match.getTeamB());
+
+        return teamAAdmin || teamBAdmin;
     }
 }
