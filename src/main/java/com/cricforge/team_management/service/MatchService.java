@@ -69,4 +69,9 @@ public class MatchService {
         return matchRepo.findById(matchId)
                 .orElseThrow(() -> new IllegalArgumentException("Match not found"));
     }
+
+    public ScoreBoard getScoreBoard(Match match) {
+        return scoreboardRepo.findByMatch(match)
+                .orElseThrow(() -> new IllegalStateException("Scoreboard not initialized"));
+    }
 }

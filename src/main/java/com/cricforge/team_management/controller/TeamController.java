@@ -88,4 +88,10 @@ public class TeamController {
 
         return teamService.addPlayer(team, request);
     }
+
+    @GetMapping("/summary")
+    public List<TeamSummary> listSummary(HttpServletRequest http) {
+        UserAccount user = (UserAccount) http.getAttribute("authUser");
+        return teamService.getAllTeamSummaries(user);
+    }
 }

@@ -4,6 +4,7 @@ import com.cricforge.team_management.domain.*;
 import com.cricforge.team_management.dto.PlayerRequest;
 import com.cricforge.team_management.dto.PlayerResponse;
 import com.cricforge.team_management.dto.TeamRegistrationRequest;
+import com.cricforge.team_management.dto.TeamSummary;
 import com.cricforge.team_management.exception.AccessDeniedException;
 import com.cricforge.team_management.mapper.PlayerMapper;
 import com.cricforge.team_management.repository.PlayerRepository;
@@ -165,5 +166,12 @@ public class TeamService {
                 saved.getRole(),
                 saved.getType().name()
         );
+    }
+
+    public List<TeamSummary> getAllTeamSummaries(UserAccount user) {
+        List<Team> teams = teamRepo.findAll();
+        return teams.stream()
+                .map(team -> new TeamSummary(team.getId(), team.getName()))
+                .toList();
     }
 }

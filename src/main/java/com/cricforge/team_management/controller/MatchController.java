@@ -4,8 +4,10 @@ import com.cricforge.team_management.domain.Match;
 import com.cricforge.team_management.domain.UserAccount;
 import com.cricforge.team_management.dto.BallUpdateRequest;
 import com.cricforge.team_management.dto.MatchRequest;
+import com.cricforge.team_management.dto.MatchResponse;
 import com.cricforge.team_management.dto.ScoreBoardResponse;
 import com.cricforge.team_management.exception.AccessDeniedException;
+import com.cricforge.team_management.mapper.MatchMapper;
 import com.cricforge.team_management.service.AuthorizationService;
 import com.cricforge.team_management.service.MatchService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,6 +27,12 @@ public class MatchController {
     @PostMapping
     public ResponseEntity<?> createMatch(@RequestBody MatchRequest req) {
         return ResponseEntity.ok(matchService.createMatch(req));
+    }
+
+    @GetMapping("/{matchId}")
+    public MatchResponse getMatchScoreBoard(@PathVariable Long matchId) {
+        Match match = matchService.getMatch(matchId);
+        return MatchMapper.toResponse(match, matchService.getScoreBoard(match));
     }
 
     @PostMapping("/matches/{matchId}/ball")

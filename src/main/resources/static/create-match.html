@@ -35,7 +35,7 @@
 
     async function loadTeams() {
         try {
-            allTeams = await api('/teams');
+            allTeams = await api('/teams/summary');
             console.log("Loaded teams:", allTeams);
             populateDropdowns();
         } catch (err) {
@@ -71,6 +71,19 @@
             .filter(t => t.id !== A)
             .map(t => `<option value="${t.id}">${t.name}</option>`)
             .join('');
+    }
+
+    async function createMatch() {
+        const body = {
+            teamAId: teamA.value,
+            teamBId: teamB.value,
+            maxOvers: overs.value
+        };
+
+        const res = await api('/matches', 'POST', body);
+        const m = await res.json();
+
+        window.location = `scoreboard.html?matchId=${m.matchId}`;
     }
 
     document.addEventListener("DOMContentLoaded", loadTeams);
