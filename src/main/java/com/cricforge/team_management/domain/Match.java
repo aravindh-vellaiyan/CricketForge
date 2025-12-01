@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
 @Getter
 @Setter
 @Entity
@@ -16,18 +18,16 @@ public class Match {
     @ManyToOne private Team teamA;
     @ManyToOne private Team teamB;
 
-    private int innings = 1;
-
-    private int totalRuns = 0;
-    private int wickets = 0;
-
-    private int balls = 0; // balls in current over (0–5)
-    private int overs = 0;
+    private int maxOvers;     // metadata
+    private LocalDateTime startTime;
 
     @Enumerated(EnumType.STRING)
-    private MatchStatus status = MatchStatus.IN_PROGRESS;
+    private MatchStatus status = MatchStatus.NOT_STARTED;
 
-    @ManyToOne private Player striker;
-    @ManyToOne private Player nonStriker;
-    @ManyToOne private Player bowler;
+    // Pre-match setup
+    @ElementCollection
+    private List<Long> teamAPlayers; // Playing XI IDs
+
+    @ElementCollection
+    private List<Long> teamBPlayers;
 }

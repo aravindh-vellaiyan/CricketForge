@@ -17,13 +17,14 @@ public class BallEvent {
     private Long id;
 
     @ManyToOne
-    private Match match;
-
-    private int runs;          // 0–6 (including boundaries)
-    private boolean isWicket;
-    private boolean isExtra;
-    private String extraType;  // WIDE, NO_BALL, BYE, LEG_BYE
+    private ScoreBoard scoreBoard;
 
     private int overNumber;
     private int ballNumber;
+
+    private int runs;
+    private boolean wicket;
+
+    private boolean extra;
+    private String extraType;
 }

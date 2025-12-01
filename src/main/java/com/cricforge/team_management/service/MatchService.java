@@ -3,8 +3,8 @@ package com.cricforge.team_management.service;
 import com.cricforge.team_management.domain.*;
 import com.cricforge.team_management.dto.BallUpdateRequest;
 import com.cricforge.team_management.dto.MatchRequest;
-import com.cricforge.team_management.dto.MatchResponse;
-import com.cricforge.team_management.mapper.MatchMapper;
+import com.cricforge.team_management.dto.ScoreBoardResponse;
+import com.cricforge.team_management.mapper.ScoreBoardMapper;
 import com.cricforge.team_management.repository.BallEventRepository;
 import com.cricforge.team_management.repository.MatchRepository;
 import com.cricforge.team_management.repository.TeamRepository;
@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 public class MatchService {
@@ -26,6 +25,9 @@ public class MatchService {
 
     @Autowired
     private BallEventRepository ballEventRepo;
+
+    @Autowired
+    private ScoreBoardRepository scoreboardRepo;
 
     public Match createMatch(MatchRequest req) {
 
@@ -47,66 +49,19 @@ public class MatchService {
     }
 
     @Transactional
-    public MatchResponse updateBall(Match match, BallUpdateRequest req, UserAccount user) {
+    public ScoreBoardResponse updateBall(Match match, BallUpdateRequest req, UserAccount user) {
 
-        if (match.getStatus() != MatchStatus.IN_PROGRESS) {
-            throw new IllegalStateException("Match is not active");
-        }
+        ScoreBoard sb = scoreboardRepo.findByMatch(match)
+                .orElseThrow(() -> new IllegalStateException("Scoreboard not initialized"));
 
-        BallEvent event = new BallEvent();
-        event.setMatch(match);
+        // All scoring logic applied to "sb", NOT match
+        // - Update runs, wickets, overs, balls
+        // - Rotate strike
+        // - Check end of innings
+        // - Save BallEvent
 
-        boolean legal = true;
-
-        // EXTRAS
-        if (req.extraType() != null) {
-            legal = false;
-            event.setExtra(true);
-            event.setExtraType(req.extraType());
-            match.setTotalRuns(match.getTotalRuns() + 1);
-        }
-
-        // Runs
-        match.setTotalRuns(match.getTotalRuns() + req.runs());
-        event.setRuns(req.runs());
-
-        // Wicket
-        if (req.wicket()) {
-            match.setWickets(match.getWickets() + 1);
-            event.setWicket(true);
-            // Assign new batsman externally (another endpoint)
-        }
-
-        // Update ball/over counters
-        if (legal) {
-            int ball = match.getBalls() + 1;
-            if (ball == 6) {
-                match.setBalls(0);
-                match.setOvers(match.getOvers() + 1);
-
-                // Rotate strike end of over
-                rotateStrike(match);
-            } else {
-                match.setBalls(ball);
-            }
-
-            // Rotate strike for odd runs
-            if (req.runs() % 2 == 1) {
-                rotateStrike(match);
-            }
-        }
-
-        // Persist
-        ballEventRepo.save(event);
-        matchRepo.save(match);
-
-        return MatchMapper.toResponse(match);
-    }
-
-    private void rotateStrike(Match m) {
-        Player temp = m.getStriker();
-        m.setStriker(m.getNonStriker());
-        m.setNonStriker(temp);
+        scoreboardRepo.save(sb);
+        return ScoreBoardMapper.toResponse(sb);
     }
 
     public Match getMatch(Long matchId) {
