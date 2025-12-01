@@ -4,7 +4,7 @@ import com.cricforge.team_management.domain.Match;
 import com.cricforge.team_management.domain.UserAccount;
 import com.cricforge.team_management.dto.BallUpdateRequest;
 import com.cricforge.team_management.dto.MatchRequest;
-import com.cricforge.team_management.dto.MatchResponse;
+import com.cricforge.team_management.dto.ScoreBoardResponse;
 import com.cricforge.team_management.exception.AccessDeniedException;
 import com.cricforge.team_management.service.AuthorizationService;
 import com.cricforge.team_management.service.MatchService;
@@ -28,7 +28,7 @@ public class MatchController {
     }
 
     @PostMapping("/matches/{matchId}/ball")
-    public MatchResponse updateBall(
+    public ScoreBoardResponse updateBall(
             @PathVariable Long matchId,
             @RequestBody BallUpdateRequest req,
             HttpServletRequest http) {

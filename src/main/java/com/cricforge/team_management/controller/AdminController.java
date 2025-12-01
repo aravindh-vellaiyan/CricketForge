@@ -24,7 +24,6 @@ public class AdminController {
     @PostMapping("/update-user-role/{userId}")
     public void promoteToAppAdmin(
             @PathVariable Long userId,
-
             HttpServletRequest req
     ) {
         UserAccount admin = (UserAccount) req.getAttribute("authenticatedUser");

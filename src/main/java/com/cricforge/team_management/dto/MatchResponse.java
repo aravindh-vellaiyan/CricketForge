@@ -1,7 +1,5 @@
 package com.cricforge.team_management.dto;
 
-import java.util.List;
-
 public record MatchResponse(
         Long matchId,
         String status,
@@ -10,9 +8,9 @@ public record MatchResponse(
         int wickets,
         int overs,
         int balls,
-        PlayerSummary striker,
-        PlayerSummary nonStriker,
-        PlayerSummary bowler,
-        TeamSummary teamA,
-        TeamSummary teamB
+        PlayerResponse striker,
+        PlayerResponse nonStriker,
+        PlayerResponse bowler,
+        TeamResponse teamA,
+        TeamResponse teamB
 ) {}

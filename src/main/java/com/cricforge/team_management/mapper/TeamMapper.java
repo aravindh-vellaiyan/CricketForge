@@ -5,7 +5,7 @@ import com.cricforge.team_management.domain.Team;
 import com.cricforge.team_management.domain.TeamRole;
 import com.cricforge.team_management.dto.PlayerResponse;
 import com.cricforge.team_management.dto.TeamResponse;
-import com.cricforge.team_management.dto.UserSummaryResponse;
+import com.cricforge.team_management.dto.UserResponse;
 
 import java.util.List;
 
@@ -13,13 +13,14 @@ public class TeamMapper {
 
     public static TeamResponse toResponse(Team team) {
 
-        List<UserSummaryResponse> admins =
+        List<UserResponse> admins =
                 team.getUserRoles().stream()
                         .filter(role -> role.getRole() == TeamRole.TEAM_ADMIN)
-                        .map(role -> new UserSummaryResponse(
+                        .map(role -> new UserResponse(
                                 role.getUser().getId(),
                                 role.getUser().getName(),
-                                role.getUser().getEmail()
+                                role.getUser().getEmail(),
+                                null
                         ))
                         .toList();
 

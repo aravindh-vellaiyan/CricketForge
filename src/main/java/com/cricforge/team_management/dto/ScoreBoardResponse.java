@@ -7,7 +7,7 @@ public record ScoreBoardResponse (
         int wickets,
         int overs,
         int balls,
-        PlayerSummary striker,
-        PlayerSummary nonStriker,
-        PlayerSummary bowler
+        PlayerResponse striker,
+        PlayerResponse nonStriker,
+        PlayerResponse bowler
 ){}

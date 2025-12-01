@@ -1,7 +1,11 @@
 package com.cricforge.team_management.service;
 
 import com.cricforge.team_management.domain.*;
+import com.cricforge.team_management.dto.PlayerRequest;
+import com.cricforge.team_management.dto.PlayerResponse;
 import com.cricforge.team_management.dto.TeamRegistrationRequest;
+import com.cricforge.team_management.exception.AccessDeniedException;
+import com.cricforge.team_management.repository.PlayerRepository;
 import com.cricforge.team_management.repository.TeamRepository;
 import com.cricforge.team_management.repository.UserAccountRepository;
 import com.cricforge.team_management.repository.UserTeamRoleRepository;
@@ -23,6 +27,9 @@ public class TeamService {
 
     @Autowired
     private UserTeamRoleRepository userTeamRoleRepo;
+
+    @Autowired
+    private PlayerRepository playerRepository;
 
     @Transactional
     public Team registerTeam(TeamRegistrationRequest req, UserAccount creator) {
@@ -92,5 +99,47 @@ public class TeamService {
         }
         utr.setRole(teamRole);
         userTeamRoleRepo.save(utr);
+    }
+
+    @Transactional
+    public PlayerResponse updatePlayer(Team team, Long playerId, PlayerRequest body) {
+
+        Player player = playerRepository.findById(playerId)
+                .orElseThrow(() -> new IllegalArgumentException("Player not found"));
+
+        if (!player.getTeam().getId().equals(team.getId())) {
+            throw new AccessDeniedException("Player does not belong to this team");
+        }
+
+        if (body.firstName() != null && !body.firstName().isBlank()) {
+            player.setFirstName(body.firstName());
+        }
+
+        if (body.lastName() != null) {
+            player.setLastName(body.lastName());
+        }
+
+        if (body.role() != null) {
+            player.setRole(body.role());
+        }
+
+        if (body.type() != null && !body.type().isBlank()) {
+            try {
+                PlayerType newType = PlayerType.valueOf(body.type().toUpperCase());
+                player.setType(newType);
+            } catch (IllegalArgumentException ex) {
+                throw new IllegalArgumentException("Invalid player type: " + body.type());
+            }
+        }
+
+        Player saved = playerRepository.save(player);
+
+        return new PlayerResponse(
+                saved.getId(),
+                saved.getFirstName(),
+                saved.getLastName(),
+                saved.getRole(),
+                saved.getType().name()
+        );
     }
 }

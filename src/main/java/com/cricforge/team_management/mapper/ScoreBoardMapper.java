@@ -1,8 +1,9 @@
 package com.cricforge.team_management.mapper;
 
 import com.cricforge.team_management.domain.Player;
+import com.cricforge.team_management.domain.PlayerType;
 import com.cricforge.team_management.domain.ScoreBoard;
-import com.cricforge.team_management.dto.PlayerSummary;
+import com.cricforge.team_management.dto.PlayerResponse;
 import com.cricforge.team_management.dto.ScoreBoardResponse;
 
 public class ScoreBoardMapper {
@@ -16,17 +17,20 @@ public class ScoreBoardMapper {
                 sb.getWickets(),
                 sb.getOvers(),
                 sb.getBalls(),
-                toSummary(sb.getStriker()),
-                toSummary(sb.getNonStriker()),
-                toSummary(sb.getBowler())
+                toPlayerResponse(sb.getStriker()),
+                toPlayerResponse(sb.getNonStriker()),
+                toPlayerResponse(sb.getBowler())
         );
     }
 
-    private static PlayerSummary toSummary(Player p) {
-        if (p == null) return null;
-        return new PlayerSummary(
-                p.getId(),
-                p.getFirstName() + " " + (p.getLastName() == null ? "" : p.getLastName())
+    private static PlayerResponse toPlayerResponse(Player player) {
+        if (player == null) return null;
+        return new PlayerResponse(
+                player.getId(),
+                player.getFirstName() + " " + (player.getLastName() == null ? "" : player.getLastName()),
+                player.getLastName(),
+                player.getRole(),
+                PlayerType.getPlayerType(player.getType())
         );
     }
 }

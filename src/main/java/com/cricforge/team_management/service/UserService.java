@@ -8,6 +8,7 @@ import com.cricforge.team_management.dto.SignupRequest;
 import com.cricforge.team_management.dto.UserResponse;
 import com.cricforge.team_management.repository.UserAccountRepository;
 import com.cricforge.team_management.repository.UserSessionRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,19 +29,20 @@ public class UserService {
 
     private static final SecureRandom random = new SecureRandom();
 
-    public UserResponse signup(SignupRequest req) {
-        if (userRepo.existsByEmail(req.email())) {
+    @Transactional
+    public UserAccount signup(SignupRequest request) {
+
+        if (userRepo.existsByEmail(request.email())) {
             throw new IllegalArgumentException("Email already registered");
         }
 
         UserAccount user = new UserAccount();
-        user.setName(req.name());
-        user.setEmail(req.email());
-        user.setPasswordHash(hash(req.password()));
+        user.setName(request.name());
+        user.setEmail(request.email());
+        user.setPasswordHash(hash(request.password()));
+        user.setRole(Role.USER);
 
-        userRepo.save(user);
-
-        return new UserResponse(user.getId(), user.getName(), user.getEmail(), Role.getRole(user.getRole()));
+        return userRepo.save(user);
     }
 
     public UserSession login(LoginRequest req) {

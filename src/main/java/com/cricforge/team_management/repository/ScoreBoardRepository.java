@@ -10,6 +10,4 @@ import com.cricforge.team_management.domain.ScoreBoard;
 public interface ScoreBoardRepository extends JpaRepository<ScoreBoard, Long> {
 
     Optional<ScoreBoard> findByMatch(Match match);
-
-    Optional<ScoreBoard> findByMatchId(Long matchId);
 }
