@@ -1,33 +1,40 @@
-<!DOCTYPE html>
 <html>
 <head>
     <title>Login</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="app.js"></script>
 </head>
 <body>
 
-<h2>Login</h2>
+<div class="container">
+    <h2>Login</h2>
 
-<input id="email" placeholder="Email">
-<input id="password" type="password" placeholder="Password">
-<button onclick="login()">Login</button>
+    <div class="error" id="error"></div>
 
-<p class="error" id="error"></p>
+    <input id="email" placeholder="Email">
+    <input id="password" type="password" placeholder="Password">
 
-<script src="app.js"></script>
+    <button onclick="login()">Login</button>
+
+    <div class="nav">
+        <a href="signup.html">Create Account</a>
+    </div>
+</div>
+
 <script>
     async function login() {
         try {
-            await api("http://localhost:8080/auth/login", "POST", {
+            await api('/auth/login', 'POST', {
                 email: email.value,
                 password: password.value
             });
-            redirect("teams.html");
+
+            window.location = "home.html";
         } catch (err) {
-            showError("error", "Invalid credentials");
+            showError(err.message);
         }
     }
-    clearErrorOnInput("error");
 </script>
+
 </body>
 </html>

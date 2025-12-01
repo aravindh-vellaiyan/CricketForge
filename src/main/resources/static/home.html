@@ -1,0 +1,35 @@
+<html>
+<head>
+    <title>Home - CricForge</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="app.js"></script>
+</head>
+
+<body>
+
+<!-- Global Header -->
+<div class="header">
+    <div class="title">CricForge</div>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+</div>
+
+<div class="container">
+    <h2>Welcome to CricForge!</h2>
+    <p>Your hub for managing cricket teams, players, and live matches.</p>
+
+    <div class="menu">
+        <button onclick="window.location='create-team.html'">Register Your Team</button>
+        <button onclick="window.location='teams.html'">View All Teams</button>
+        <button onclick="window.location='create-match.html'">Create Match</button>
+        <button onclick="window.location='matches.html'">View All Matches</button>
+        <button onclick="window.location='scoreboard-select.html'">Select Match for Scoreboard</button>
+
+        <!-- Future items -->
+        <button disabled style="background:#ccc; cursor:not-allowed;">Tournament (Coming Soon)</button>
+        <button disabled style="background:#ccc; cursor:not-allowed;">Analytics (Coming Soon)</button>
+        <button disabled style="background:#ccc; cursor:not-allowed;">Leaderboard (Coming Soon)</button>
+    </div>
+</div>
+
+</body>
+</html>

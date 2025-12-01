@@ -1,41 +1,111 @@
-<!DOCTYPE html>
 <html>
 <head>
     <title>Teams</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="app.js"></script>
 </head>
-<body>
 
-<h2>All Teams</h2>
+<body onload="loadTeams()">
+<div class="header">
+    <div class="title">CricForge</div>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+</div>
 
-<div id="teams"></div>
+<div class="container">
+    <h2>Your Teams</h2>
 
-<p id="error" class="error"></p>
+    <div class="error" id="error"></div>
 
-<script src="app.js"></script>
+    <div id="list"></div>
+
+    <button onclick="window.location='create-team.html'">Create Team</button>
+</div>
+
 <script>
     async function loadTeams() {
         try {
-            const data = await api("http://localhost:8080/teams");
+            const teams = await api('/teams', 'GET');  // already json
 
-            teams.innerHTML = data.map(t => `
-                <div class="card">
-                    <h3>${t.name}</h3>
-                    <b>Players:</b>
-                    <ul>
-                        ${t.players.map(p =>
-                            `<li>${p.firstName} ${p.lastName || ''} - ${p.role || 'N/A'} (${p.type})</li>`
-                        ).join("")}
-                    </ul>
-                </div>
-            `).join("");
+            if (!Array.isArray(teams)) {
+                showError("Invalid teams response");
+                return;
+            }
+            list.innerHTML = teams.map(t => {
 
+                const adminList = (t.admins || [])
+                    .map(a => `
+                        <div class="subcard">
+                            <p><strong>Name:</strong> ${a.name}</p>
+                            <p><strong>Email:</strong> ${a.email}</p>
+                            <p><strong>Role:</strong> ${a.role ?? 'USER'}</p>
+                        </div>
+                    `).join('');
+
+                const playerList = (t.players || [])
+                    .map(p => `
+                        <div class="subcard">
+                            <p><strong>Name:</strong> ${p.firstName} ${p.lastName ?? ''}</p>
+                            <p><strong>Role:</strong> ${p.role}</p>
+                            <p><strong>Type:</strong> ${p.type}</p>
+                        </div>
+                    `).join('');
+
+                // invisible ID stored in data attributes for later use
+                return `
+                    <div class="card" data-team-id="${t.id}">
+                        <h3>${t.name}</h3>
+
+                        <h4>Admins</h4>
+                        ${adminList || '<p>No admins</p>'}
+
+                        <h4>Players</h4>
+                        ${playerList || '<p>No players</p>'}
+
+                        <button onclick="showAddPlayer(${t.id})">Add Player</button>
+
+                        <div class="add-player-form" id="add-player-${t.id}" style="display:none; margin-top:10px;">
+                            <input placeholder="First Name" id="fn-${t.id}">
+                            <input placeholder="Last Name" id="ln-${t.id}">
+                            <input placeholder="Role" id="role-${t.id}">
+                            <select id="type-${t.id}">
+                                <option value="NORMAL">Normal</option>
+                                <option value="CAPTAIN">Captain</option>
+                                <option value="VICE_CAPTAIN">Vice Captain</option>
+                            </select>
+                            <button onclick="addPlayerToTeam(${t.id})">Save Player</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         } catch (err) {
-            showError("error", "Unauthorized or session expired");
+            showError(err.message);
         }
     }
 
-    loadTeams();
+    function showAddPlayer(teamId) {
+        const block = document.getElementById(`add-player-${teamId}`);
+        block.style.display = block.style.display === "none" ? "block" : "none";
+    }
+
+    async function addPlayerToTeam(teamId) {
+        try {
+            const body = {
+                firstName: document.getElementById(`fn-${teamId}`).value,
+                lastName: document.getElementById(`ln-${teamId}`).value,
+                role: document.getElementById(`role-${teamId}`).value,
+                type: document.getElementById(`type-${teamId}`).value
+            };
+
+            await api(`/teams/${teamId}/players`, "POST", body);
+
+            alert("Player added successfully!");
+            loadTeams(); // refresh UI
+
+        } catch (err) {
+            showError(err.message);
+        }
+    }
 </script>
+
 </body>
 </html>

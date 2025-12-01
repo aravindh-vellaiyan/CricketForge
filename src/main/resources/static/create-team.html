@@ -1,49 +1,69 @@
-<!DOCTYPE html>
 <html>
 <head>
     <title>Create Team</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="app.js"></script>
 </head>
 <body>
+<div class="header">
+    <div class="title">CricForge</div>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+</div>
 
-<h2>Create Team</h2>
+<div class="container">
+    <h2>Create Team</h2>
 
-<input id="teamName" placeholder="Team Name">
+    <div class="error" id="error"></div>
 
-<textarea id="playersJson" rows="8" placeholder='[
-  {"firstName":"Rohit","lastName":"Sharma","role":"Batsman","type":"CAPTAIN"},
-  {"firstName":"Bumrah","role":"Bowler","type":"NORMAL"}
-]'></textarea>
+    <input id="name" placeholder="Team Name">
 
-<button onclick="createTeam()">Create Team</button>
+    <h3>Players</h3>
+    <div id="players"></div>
 
-<p id="error" class="error"></p>
+    <button onclick="addPlayer()">Add Player</button>
+    <button onclick="submitTeam()">Create</button>
+</div>
 
-<script src="app.js"></script>
 <script>
-    async function createTeam() {
-        try {
-            const body = {
-                name: teamName.value,
-                players: JSON.parse(playersJson.value)
-            };
+    let playerList = [];
 
-            await api("http://localhost:8080/teams", "POST", body);
+    function addPlayer() {
+        const idx = playerList.length;
+        playerList.push({});
 
-            redirect("teams.html");
-
-        } catch (err) {
-            showError("error", err.message);
-        }
+        players.innerHTML += `
+            <div class="card">
+                <input placeholder="First Name" id="pfn${idx}">
+                <input placeholder="Last Name" id="pln${idx}">
+                <input placeholder="Role" id="prole${idx}">
+                <select id="ptype${idx}">
+                    <option value="NORMAL">Normal</option>
+                    <option value="CAPTAIN">Captain</option>
+                    <option value="VICE_CAPTAIN">Vice Captain</option>
+                </select>
+            </div>
+        `;
     }
-    document.addEventListener("keydown", function(event) {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            const btn = document.querySelector("button");
-            if (btn) btn.click();
-        }
-    });
-    clearErrorOnInput("error");
+
+    async function submitTeam() {
+        try {
+            const finalPlayers = playerList.map((_, i) => ({
+                firstName: document.getElementById(`pfn${i}`).value,
+                lastName: document.getElementById(`pln${i}`).value,
+                role: document.getElementById(`prole${i}`).value,
+                type: document.getElementById(`ptype${i}`).value
+            }));
+
+            await api('/teams', 'POST', {
+                name: document.getElementById('name').value,
+                players: finalPlayers
+            });
+
+            window.location = "teams.html";
+        } catch (err) {
+        showError(err.message);
+    }
+    }
 </script>
 
 </body>

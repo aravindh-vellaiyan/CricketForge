@@ -20,7 +20,7 @@ public class TeamMapper {
                                 role.getUser().getId(),
                                 role.getUser().getName(),
                                 role.getUser().getEmail(),
-                                null
+                                TeamRole.TEAM_ADMIN.name()
                         ))
                         .toList();
 

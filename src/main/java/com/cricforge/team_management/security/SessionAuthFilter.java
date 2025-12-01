@@ -8,11 +8,12 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
 @Component
-public class SessionAuthFilter implements Filter {
+public class SessionAuthFilter extends OncePerRequestFilter {
 
     private final UserService userService;
 
@@ -21,51 +22,48 @@ public class SessionAuthFilter implements Filter {
     }
 
     @Override
-    public void doFilter(
-            ServletRequest request,
-            ServletResponse response,
-            FilterChain chain) throws IOException, ServletException {
+    protected boolean shouldNotFilter(HttpServletRequest request) {
 
-        HttpServletRequest req = (HttpServletRequest) request;
-        HttpServletResponse res = (HttpServletResponse) response;
+        String path = request.getServletPath();
 
-        String path = req.getRequestURI();
+        return path.startsWith("/auth") ||
+                path.startsWith("/static") ||
+                path.endsWith(".css") ||
+                path.endsWith(".js") ||
+                path.endsWith(".png") ||
+                path.endsWith(".jpg") ||
+                path.endsWith(".jpeg") ||
+                path.endsWith(".ico") ||
+                path.endsWith(".html") ||
+                path.equals("/");
+    }
 
-        // Allow unauthenticated endpoints
-        if (path.startsWith("/auth")) {
-            chain.doFilter(request, response);
-            return;
-        }
-
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         // Extract session cookie
         String sessionId = null;
 
-        if (req.getCookies() != null) {
-            for (Cookie c : req.getCookies()) {
-                if ("SESSION_ID".equals(c.getName())) {
-                    sessionId = c.getValue();
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("SESSION_ID".equals(cookie.getName())) {
+                    sessionId = cookie.getValue();
                     break;
                 }
             }
         }
 
         if (sessionId == null) {
-            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            res.getWriter().write("{\"error\":\"Missing session\"}");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("{\"error\":\"Missing session\"}");
             return;
         }
+        // Session validation
+        UserAccount user = userService.validateSession(sessionId)
+                .orElseThrow(() -> new InvalidSessionException("Invalid or expired session"));
 
-        try {
-            UserAccount user = userService.validateSession(sessionId)
-                    .orElseThrow(() -> new InvalidSessionException("Invalid or expired session"));
+        // Store user in request attribute so controllers can pull it
+        request.setAttribute("authUser", user);
 
-            req.setAttribute("authenticatedUser", user);
-
-            chain.doFilter(request, response);
-
-        } catch (InvalidSessionException e) {
-            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            res.getWriter().write("{\"error\":\"Invalid or expired session\"}");
-        }
+        filterChain.doFilter(request, response);
     }
 }

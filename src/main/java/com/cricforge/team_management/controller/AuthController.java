@@ -11,8 +11,10 @@ import com.cricforge.team_management.exception.InvalidSessionException;
 import com.cricforge.team_management.service.SessionService;
 import com.cricforge.team_management.service.UserService;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -81,5 +83,26 @@ public class AuthController {
                 user.getEmail(),
                 Role.getRole(user.getRole())
         );
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
+        // Extract cookie
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie c : cookies) {
+                if (c.getName().equals("SESSION_ID")) {
+                    sessionService.deleteSession(c.getValue());
+                }
+            }
+        }
+
+        // Clear cookie in client
+        Cookie clear = new Cookie("SESSION_ID", "");
+        clear.setMaxAge(0);
+        clear.setPath("/");
+        response.addCookie(clear);
+
+        return ResponseEntity.ok().build();
     }
 }

@@ -1,0 +1,67 @@
+<html>
+<head>
+    <title>Scoreboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="app.js"></script>
+</head>
+
+<body onload="loadScoreboard()">
+
+<div class="container">
+    <h2 id="title"></h2>
+    <h3 id="score"></h3>
+    <h4 id="batsmen"></h4>
+    <h4 id="bowler"></h4>
+
+    <h3>Update Ball</h3>
+
+    <select id="runs">
+        <option value="0">0</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="6">6</option>
+    </select>
+
+    <select id="extra">
+        <option value="">None</option>
+        <option value="WIDE">Wide</option>
+        <option value="NO_BALL">No Ball</option>
+        <option value="BYE">Bye</option>
+        <option value="LEG_BYE">Leg Bye</option>
+    </select>
+
+    <label><input type="checkbox" id="wicket">Wicket</label>
+
+    <button onclick="updateBall()">Submit Ball</button>
+</div>
+
+<script>
+    let matchId = new URLSearchParams(location.search).get('matchId');
+
+    async function loadScoreboard() {
+        const res = await api(`/matches/${matchId}`, 'GET');
+        const m = await res.json();
+
+        title.innerText = `${m.teamA.name} vs ${m.teamB.name}`;
+        score.innerText = `${m.totalRuns}/${m.wickets} in ${m.overs}.${m.balls}`;
+        batsmen.innerText = `Striker: ${m.striker?.firstName ?? ''} | Non-Striker: ${m.nonStriker?.firstName ?? ''}`;
+        bowler.innerText = `Bowler: ${m.bowler?.firstName ?? ''}`;
+    }
+
+    async function updateBall() {
+        const body = {
+            runs: Number(runs.value),
+            wicket: wicket.checked,
+            extraType: extra.value || null
+        };
+
+        await api(`/matches/${matchId}/ball`, 'POST', body);
+
+        loadScoreboard();
+    }
+</script>
+
+</body>
+</html>

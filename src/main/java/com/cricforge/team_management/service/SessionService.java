@@ -22,4 +22,8 @@ public class SessionService {
         session.setExpiresAt(LocalDateTime.now().plusDays(7));
         return sessionRepo.save(session);
     }
+
+    public void deleteSession(String sessionId) {
+        sessionRepo.deleteBySessionId(sessionId);
+    }
 }

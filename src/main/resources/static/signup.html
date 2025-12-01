@@ -1,52 +1,42 @@
-<!DOCTYPE html>
 <html>
 <head>
     <title>Signup</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="app.js"></script>
 </head>
 <body>
 
-<h2>Signup</h2>
+<div class="container">
+    <h2>Create Account</h2>
 
-<label for="name"></label><input id="name" placeholder="Name">
-<label for="email"></label><input id="email" placeholder="Email">
-<label for="password"></label><input id="password" type="password" placeholder="Password">
+    <div class="error" id="error"></div>
 
-<button onclick="signup()">Signup</button>
+    <input id="name" placeholder="Name">
+    <input id="email" placeholder="Email">
+    <input id="password" type="password" placeholder="Password">
 
-<p class="error" id="error"></p>
+    <button onclick="signup()">Create Account</button>
 
-<script src="app.js"></script>
+    <div class="nav">
+        <a href="login.html">Already have an account?</a>
+    </div>
+</div>
+
 <script>
     async function signup() {
         try {
-            const nameValue = document.getElementById("name").value;
-            const emailValue = document.getElementById("email").value;
-            const passwordValue = document.getElementById("password").value;
-
-            await api("http://localhost:8080/auth/signup", "POST", {
-                name: nameValue,
-                email: emailValue,
-                password: passwordValue
+            const res = await api('/auth/signup', 'POST', {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value
             });
 
-            redirect("login.html");
-
+            window.location = "home.html";
         } catch (err) {
-            showError("error", err.message);
+            showError(err.message);
         }
     }
-    document.addEventListener("keydown", function(event) {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            const btn = document.querySelector("button");
-            if (btn) btn.click();
-        }
-    });
-    document.addEventListener("", function() {
-
-    });
-    clearErrorOnInput("error");
 </script>
+
 </body>
 </html>

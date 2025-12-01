@@ -1,47 +1,17 @@
-<!DOCTYPE html>
 <html>
 <head>
-    <title>Cricket App</title>
+    <title>CricForge</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<h1>Cricket Management App</h1>
+<div class="container">
+    <h1>CricForge</h1>
+    <h3>Cricket Team & Match Manager</h3>
 
-<div id="loggedOut">
-    <button onclick="redirect('signup.html')">Signup</button>
-    <button onclick="redirect('login.html')">Login</button>
+    <button onclick="window.location='signup.html'">Signup</button>
+    <button onclick="window.location='login.html'">Login</button>
 </div>
-
-<div id="loggedIn" style="display:none;">
-    <h3>Welcome! Choose an Action:</h3>
-    <button onclick="redirect('teams.html')">View Teams</button>
-    <button onclick="redirect('create-team.html')">Create Team</button>
-    <button onclick="redirect('create-match.html')">Create Match</button>
-    <button onclick="logout()">Logout</button>
-</div>
-
-<script src="app.js"></script>
-<script>
-    async function checkLogin() {
-        try {
-            const user = await api("http://localhost:8080/auth/me");
-            document.getElementById("loggedOut").style.display = "none";
-            document.getElementById("loggedIn").style.display = "block";
-        } catch (err) {
-            document.getElementById("loggedOut").style.display = "block";
-            document.getElementById("loggedIn").style.display = "none";
-        }
-    }
-
-    async function logout() {
-        document.cookie = "SESSION_ID=; Max-Age=0; path=/";
-        redirect("index.html");
-    }
-
-    checkLogin();
-
-</script>
 
 </body>
 </html>

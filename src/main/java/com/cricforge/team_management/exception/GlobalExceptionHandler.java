@@ -55,4 +55,15 @@ public class GlobalExceptionHandler {
                         "message", ex.getMessage()
                 ));
     }
+
+    @ExceptionHandler(InvalidTeamException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidTeam(InvalidTeamException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of(
+                        "timestamp", Instant.now().toString(),
+                        "status", HttpStatus.BAD_REQUEST.value(),
+                        "error", "Bad Request",
+                        "message", ex.getMessage()
+                ));
+    }
 }

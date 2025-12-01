@@ -5,6 +5,7 @@ import com.cricforge.team_management.dto.PlayerRequest;
 import com.cricforge.team_management.dto.PlayerResponse;
 import com.cricforge.team_management.dto.TeamRegistrationRequest;
 import com.cricforge.team_management.exception.AccessDeniedException;
+import com.cricforge.team_management.mapper.PlayerMapper;
 import com.cricforge.team_management.repository.PlayerRepository;
 import com.cricforge.team_management.repository.TeamRepository;
 import com.cricforge.team_management.repository.UserAccountRepository;
@@ -38,7 +39,7 @@ public class TeamService {
             throw new IllegalArgumentException("Max 15 players allowed");
         }
 
-        long captainCount = req.players().stream().filter(p -> "CAPTAIN".equals(p.type())).count();
+        long captainCount = req.players().stream().filter(playerRequest -> "CAPTAIN".equals(playerRequest.type())).count();
         if (captainCount != 1) {
             throw new IllegalArgumentException("Exactly one captain required");
         }
@@ -51,17 +52,17 @@ public class TeamService {
         Team team = new Team();
         team.setName(req.name());
 
-        List<Player> players = req.players().stream().map(pr -> {
-            if (pr.firstName() == null || pr.firstName().isBlank()) {
+        List<Player> players = req.players().stream().map(playerRequest -> {
+            if (playerRequest.firstName() == null || playerRequest.firstName().isBlank()) {
                 throw new IllegalArgumentException("Player first name required");
             }
 
             Player player = new Player();
             player.setTeam(team);
-            player.setFirstName(pr.firstName());
-            player.setLastName(pr.lastName());
-            player.setRole(pr.role());
-            player.setType(PlayerType.valueOf(pr.type()));
+            player.setFirstName(playerRequest.firstName());
+            player.setLastName(playerRequest.lastName());
+            player.setRole(playerRequest.role());
+            player.setType(PlayerType.valueOf(playerRequest.type()));
 
             return player;
         }).toList();
@@ -70,12 +71,12 @@ public class TeamService {
         Team registeredTeam = teamRepo.save(team);
 
         // Assign creator as TEAM_ADMIN
-        UserTeamRole utr = new UserTeamRole();
-        utr.setTeam(registeredTeam);
-        utr.setUser(creator);
-        utr.setRole(TeamRole.TEAM_ADMIN);
+        UserTeamRole userTeamRole = new UserTeamRole();
+        userTeamRole.setTeam(registeredTeam);
+        userTeamRole.setUser(creator);
+        userTeamRole.setRole(TeamRole.TEAM_ADMIN);
 
-        userTeamRoleRepo.save(utr);
+        userTeamRoleRepo.save(userTeamRole);
 
         return registeredTeam;
     }
@@ -133,6 +134,29 @@ public class TeamService {
         }
 
         Player saved = playerRepository.save(player);
+
+        return new PlayerResponse(
+                saved.getId(),
+                saved.getFirstName(),
+                saved.getLastName(),
+                saved.getRole(),
+                saved.getType().name()
+        );
+    }
+
+    @Transactional
+    public PlayerResponse addPlayer(Team team, PlayerRequest request) {
+
+        Player player = PlayerMapper.toPlayer(request);
+        player.setTeam(team);
+
+        // max 15 players rule
+        if (team.getPlayers().size() >= 15) {
+            throw new IllegalArgumentException("Team cannot have more than 15 players");
+        }
+
+        Player saved = playerRepository.save(player);
+        team.getPlayers().add(saved);
 
         return new PlayerResponse(
                 saved.getId(),

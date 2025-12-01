@@ -1,45 +1,79 @@
-<!DOCTYPE html>
 <html>
 <head>
     <title>Create Match</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="app.js"></script>
 </head>
+
 <body>
 
-<h2>Create Match</h2>
+<div class="header">
+    <div class="title">CricForge</div>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+</div>
 
-<input id="teamA" placeholder="Team A ID">
-<input id="teamB" placeholder="Team B ID">
-<input id="date" type="datetime-local">
+<div class="container">
+    <h2>Create Match</h2>
 
-<button onclick="createMatch()">Create Match</button>
+    <div class="error" id="error"></div>
 
-<p id="error" class="error"></p>
+    <label>Team A</label>
+    <select id="teamA"></select>
 
-<script src="app.js"></script>
+    <label>Team B</label>
+    <select id="teamB"></select>
+
+    <label>Overs</label>
+    <input id="overs" type="number">
+
+    <button onclick="createMatch()">Create Match</button>
+</div>
+
+<!-- JS MUST BE AT BOTTOM -->
 <script>
-    async function createMatch() {
+    let allTeams = [];
+
+    async function loadTeams() {
         try {
-            await api("http://localhost:8080/matches", "POST", {
-                teamAId: Number(teamA.value),
-                teamBId: Number(teamB.value),
-                scheduledAt: date.value
-            });
-
-            redirect("teams.html");
-
+            allTeams = await api('/teams');
+            console.log("Loaded teams:", allTeams);
+            populateDropdowns();
         } catch (err) {
-            showError("error", err.message);
+            showError(err.message);
         }
     }
-    document.addEventListener("keydown", function(event) {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            const btn = document.querySelector("button");
-            if (btn) btn.click();
-        }
-    });
-    clearErrorOnInput("error");
+
+    function populateDropdowns() {
+        const teamA = document.getElementById("teamA");
+        const teamB = document.getElementById("teamB");
+
+        teamA.innerHTML = allTeams
+            .map(t => `<option value="${t.id}">${t.name}</option>`)
+            .join('');
+
+        teamB.innerHTML = allTeams
+            .map(t => `<option value="${t.id}">${t.name}</option>`)
+            .join('');
+
+        filterTeams();
+    }
+
+    function filterTeams() {
+        const A = Number(teamA.value);
+        const B = Number(teamB.value);
+
+        teamA.innerHTML = allTeams
+            .filter(t => t.id !== B)
+            .map(t => `<option value="${t.id}">${t.name}</option>`)
+            .join('');
+
+        teamB.innerHTML = allTeams
+            .filter(t => t.id !== A)
+            .map(t => `<option value="${t.id}">${t.name}</option>`)
+            .join('');
+    }
+
+    document.addEventListener("DOMContentLoaded", loadTeams);
 </script>
 
 </body>

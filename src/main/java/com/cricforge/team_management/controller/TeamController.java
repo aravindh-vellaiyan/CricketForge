@@ -3,6 +3,7 @@ package com.cricforge.team_management.controller;
 import com.cricforge.team_management.domain.Team;
 import com.cricforge.team_management.domain.UserAccount;
 import com.cricforge.team_management.dto.*;
+import com.cricforge.team_management.exception.InvalidTeamException;
 import com.cricforge.team_management.mapper.TeamMapper;
 import com.cricforge.team_management.service.AuthorizationService;
 import com.cricforge.team_management.service.TeamService;
@@ -25,6 +26,7 @@ public class TeamController {
     @Autowired
     private UserService userService;
 
+    @Autowired
     private AuthorizationService authorizationService;
 
     @PostMapping
@@ -32,7 +34,7 @@ public class TeamController {
         return ResponseEntity.ok(teamService.registerTeam(teamRegistrationRequest, (UserAccount)httpServletRequest.getAttribute("authenticatedUser")));
     }
 
-    @GetMapping("/teams")
+    @GetMapping
     public List<TeamResponse> getTeams(HttpServletRequest req) {
         UserAccount user = (UserAccount) req.getAttribute("authenticatedUser");
         return teamService.getAllTeams()
@@ -71,5 +73,19 @@ public class TeamController {
         authorizationService.requireTeamAdmin(user, team);
 
         teamService.updateUserTeamRole(user, team, teamRoleUpdateRequest.newRole());
+    }
+
+    @PostMapping("/{teamId}/players")
+    public PlayerResponse addPlayer(
+            @PathVariable Long teamId,
+            @RequestBody PlayerRequest request,
+            HttpServletRequest http) {
+
+        UserAccount user = (UserAccount) http.getAttribute("authUser");
+        Team team = teamService.getTeam(teamId).orElseThrow(() -> new InvalidTeamException("Invalid Team.!"));
+
+        authorizationService.requireTeamAdmin(user, team);
+
+        return teamService.addPlayer(team, request);
     }
 }

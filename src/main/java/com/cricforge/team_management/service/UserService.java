@@ -5,7 +5,6 @@ import com.cricforge.team_management.domain.UserAccount;
 import com.cricforge.team_management.domain.UserSession;
 import com.cricforge.team_management.dto.LoginRequest;
 import com.cricforge.team_management.dto.SignupRequest;
-import com.cricforge.team_management.dto.UserResponse;
 import com.cricforge.team_management.repository.UserAccountRepository;
 import com.cricforge.team_management.repository.UserSessionRepository;
 import jakarta.transaction.Transactional;
