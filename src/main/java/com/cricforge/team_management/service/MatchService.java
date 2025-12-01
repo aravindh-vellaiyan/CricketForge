@@ -7,6 +7,7 @@ import com.cricforge.team_management.dto.ScoreBoardResponse;
 import com.cricforge.team_management.mapper.ScoreBoardMapper;
 import com.cricforge.team_management.repository.BallEventRepository;
 import com.cricforge.team_management.repository.MatchRepository;
+import com.cricforge.team_management.repository.ScoreBoardRepository;
 import com.cricforge.team_management.repository.TeamRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,17 +52,17 @@ public class MatchService {
     @Transactional
     public ScoreBoardResponse updateBall(Match match, BallUpdateRequest req, UserAccount user) {
 
-        ScoreBoard sb = scoreboardRepo.findByMatch(match)
+        ScoreBoard scoreBoard = scoreboardRepo.findByMatch(match)
                 .orElseThrow(() -> new IllegalStateException("Scoreboard not initialized"));
 
-        // All scoring logic applied to "sb", NOT match
+        // All scoring logic applied to "scoreBoard", NOT match
         // - Update runs, wickets, overs, balls
         // - Rotate strike
         // - Check end of innings
         // - Save BallEvent
 
-        scoreboardRepo.save(sb);
-        return ScoreBoardMapper.toResponse(sb);
+        scoreboardRepo.save(scoreBoard);
+        return ScoreBoardMapper.toResponse(scoreBoard);
     }
 
     public Match getMatch(Long matchId) {
