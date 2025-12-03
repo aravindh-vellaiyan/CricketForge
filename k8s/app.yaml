@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cricforge-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cricforge-app
+  template:
+    metadata:
+      labels:
+        app: cricforge-app
+    spec:
+      containers:
+        - name: cricforge-app
+          image: your-dockerhub-username/cricforge:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_DATASOURCE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: SPRING_DATASOURCE_URL
+
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: username
+
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: password
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cricforge-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: cricforge-app
+  ports:
+    - port: 80
+      targetPort: 8080
