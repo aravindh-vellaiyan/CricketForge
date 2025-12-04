@@ -1,5 +1,6 @@
-package com.cricforge.team_management.domain;
+package com.cricforge.team_management.mongo;
 
+import com.cricforge.team_management.domain.BallEvent;
 import jakarta.persistence.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -11,7 +12,7 @@ public class MatchDocument {
     private String id;
     private int teamA;
     private int teamB;
-    private MatchMetadata metadata;
+    private MatchMetaData metadata;
     private ScoreBoardData scoreboard;
     private List<BallEvent> balls;
     private String status;
